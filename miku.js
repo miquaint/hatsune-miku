@@ -17,7 +17,7 @@ let bot = new Discord.Client({
    autorun: true
 });
 bot.on('ready', function (evt) {
-    logger.info('Connection successful! Logged in as: ' + bot.username + ' (' + bot.id + ')');
+    logger.info('Connection to Miku successful! Logged in as: ' + bot.username + ' (' + bot.id + ')');
 });
 
 // Connect to the mySQL server
@@ -33,8 +33,7 @@ con.connect(function(err) {
         logger.error('Error connecting to mySQL database: ' + err.stack);
         return;
     }
-
-    logger.info('Connection successful! Connected as id ' + con.threadId);
+    logger.info('Connection to mySQL database successful! Connected as id ' + con.threadId);
 });
 
 bot.on('message', function (user, userID, channelID, message, evt) {
@@ -55,6 +54,6 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                 break;
          }
     } else {
-
+        //TODO: Experience system
     }
 });
