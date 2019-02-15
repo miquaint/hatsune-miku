@@ -1,0 +1,12 @@
+{
+  "name": "hatsune-miku",
+  "version": "1.0.0",
+  "description": "Personal Discord Bot",
+  "main": "miku.js",
+  "author": "Ikabob98",
+  "dependencies": {
+    "discord.io": "https://github.com/woor/discord.io/tarball/gateway_v6",
+    "mysql": "^2.16.0",
+    "winston": "^3.2.1"
+  }
+}
