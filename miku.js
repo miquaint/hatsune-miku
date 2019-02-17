@@ -3,6 +3,8 @@ let logger = require('winston');
 let mysql = require('mysql');
 let auth = require('./auth.json');
 let commands = require('./commands.js');
+let experience = require('./experience');
+
 // Configure logger settings
 logger.remove(logger.transports.Console);
 logger.add(new logger.transports.Console, {
@@ -22,31 +24,32 @@ bot.on('ready', function (evt) {
 
 // Connect to the mySQL server
 logger.info('Connection to mySQL database...');
-var con = mysql.createConnection({
+let connection = mysql.createConnection({
     host: auth.mysql_host,
     user: auth.mysql_user,
     password: auth.mysql_pass,
     database: auth.mysql_db
 });
-con.connect(function(err) {
+connection.connect(function(err) {
     if (err) {
         logger.error('Error connecting to mySQL database: ' + err.stack);
         return;
     }
-    logger.info('Connection to mySQL database successful! Connected as id ' + con.threadId);
+    logger.info('Connection to mySQL database successful! Connected as id ' + connection.threadId);
 });
 
 bot.on('message', function (user, userID, channelID, message, evt) {
     // Our bot needs to know if it will execute a command
     // It will listen for messages that will start with `h.`
-    if (message.substring(0, 2) === 'h.') {
-        let args = message.substring(2).split(' ');
+    let commandText = 'h.';
+    if (message.substring(0, commandText.length) === 'h.') {
+        let args = message.substring(commandText.length).split(' ');
         let cmd = args[0];
        
         args = args.splice(1);
         switch(cmd) {
 			case 'roll':
-                logger.info('Miku: Dice rolled by ' + user + '(' + userID + ')');
+                logger.verbose('Miku: Dice rolled by ' + user + '(' + userID + ')');
 				bot.sendMessage({
 					to: channelID,
 					message: commands.roll(logger, userID, args)
@@ -54,6 +57,9 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                 break;
          }
     } else {
-        //TODO: Experience system
+        // Give xp to everyone but the bot itself
+        if (userID !== bot.id) {
+            experience.message(logger, bot, connection, userID, channelID);
+        }
     }
 });
