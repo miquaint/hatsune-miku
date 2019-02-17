@@ -19,7 +19,7 @@
 }());
 
 function newUser(logger, connection, userID) {
-    logger.verbose(userID + ' is a new user! Adding them to the database...');
+    logger.verbose('Experience: ' + userID + ' is a new user! Adding them to the database...');
     // level = 1
     // total_exp = 0
     // current_exp = 0
@@ -31,7 +31,7 @@ function newUser(logger, connection, userID) {
             return;
         }
 
-        logger.verbose(userID + ' successfully added to the users database');
+        logger.verbose('Experience: ' + userID + ' successfully added to the users database');
     });
 }
 
@@ -50,7 +50,7 @@ function gainExp(logger, bot, connection, userID, channelID, userInfo) {
             return;
         }
 
-        logger.silly(userID + ' sent a message that earned them experience');
+        logger.silly('Experience: ' + userID + ' sent a message that earned them experience');
     });
 }
 
@@ -62,5 +62,5 @@ function levelUp(logger, bot, userID, channelID, userInfo) {
         to: channelID,
         message: 'Gratz <@' + userID + '>! You reached level **' + userInfo[0].level + '**!'
     });
-    logger.verbose(userID + ' just hit level ' + userInfo[0].level);
+    logger.verbose('Experience: ' + userID + ' just hit level ' + userInfo[0].level);
 }
