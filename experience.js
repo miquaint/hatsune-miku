@@ -1,5 +1,5 @@
 (function() {
-    module.exports.message = function(logger, bot, connection, userID, channelID) {
+    module.exports.message = function(logger, client, connection, userID, channel) {
         let sql = 'SELECT * FROM users WHERE id = ?';
         connection.query(sql, [userID], function(error, results, fields) {
             if (error) {
@@ -11,9 +11,9 @@
                 newUser(logger, connection, userID);
                 // Since the results were empty, populate them with the new data
                 // Same as the values in newUser
-                results = [{level: 1, total_exp: 0, current_exp: 0, required_exp: 60}];
+                results = [{level: 1, total_exp: 0, current_exp: 0, required_exp: 61}];
             }
-            gainExp(logger, bot, connection, userID, channelID, results);
+            gainExp(logger, client, connection, userID, channel, results);
         });
     }
 }());
@@ -24,7 +24,7 @@ function newUser(logger, connection, userID) {
     // total_exp = 0
     // current_exp = 0
     // required_exp = 60
-    let sql = 'INSERT INTO users VALUES (?, 1, 0, 0, 60)';
+    let sql = 'INSERT INTO users VALUES (?, 1, 0, 0, 61)';
     connection.query(sql, [userID], function(error, results, fields) {
         if (error) {
             logger.error('Error adding new user for experience: ' + error.stack);
@@ -35,11 +35,11 @@ function newUser(logger, connection, userID) {
     });
 }
 
-function gainExp(logger, bot, connection, userID, channelID, userInfo) {
+function gainExp(logger, client, connection, userID, channel, userInfo) {
     // Increase total_exp and current_exp and check to see if the user has leveled up
     userInfo[0].total_exp++;
     if (++userInfo[0].current_exp >= userInfo[0].required_exp) {
-        levelUp();
+        levelUp(logger, client, userID, channel, userInfo);
     }
 
     let sql = 'UPDATE users SET level = ?, total_exp = ?, current_exp = ?, required_exp = ? WHERE id = ?';
@@ -54,13 +54,10 @@ function gainExp(logger, bot, connection, userID, channelID, userInfo) {
     });
 }
 
-function levelUp(logger, bot, userID, channelID, userInfo) {
+function levelUp(logger, client, userID, channel, userInfo) {
     userInfo[0].current_exp = 0;
-    userInfo[0].required_exp += 60;
+    userInfo[0].required_exp += 60 + userInfo[0].level;
     userInfo[0].level++;
-    bot.sendMessage({
-        to: channelID,
-        message: 'Gratz <@' + userID + '>! You reached level **' + userInfo[0].level + '**!'
-    });
+    channel.send('Gratz <@' + userID + '>! You reached level **' + userInfo[0].level + '**!');
     logger.verbose('Experience: ' + userID + ' just hit level ' + userInfo[0].level);
 }

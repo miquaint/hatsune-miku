@@ -42,11 +42,9 @@ connection.connect(function(err) {
 client.on('message', message => {
     // Our bot needs to know if it will execute a command
     // It will listen for messages that will start with `h.`
-    if (message.content.substring(0, 2) === 'h.') {
-        let args = message.content.substring(2).split(/ +/);
     let commandText = 'h.';
-    if (message.substring(0, commandText.length) === 'h.') {
-        let args = message.substring(commandText.length).split(' ');
+    if (message.content.substring(0, commandText.length) === 'h.') {
+        let args = message.content.substring(commandText.length).split(/ +/);
         let cmd = args[0];
 
         args = args.splice(1);
@@ -58,9 +56,11 @@ client.on('message', message => {
         }
     } else {
         // Give xp to everyone but the bot itself
-        if (userID !== bot.id) {
-            experience.message(logger, bot, connection, userID, channelID);
+        if (message.author.id !== client.user.id) {
+            experience.message(logger, client, connection, message.author.id, message.channel);
+        }
 
+        // Mention a random person in the current text channel
         if (message.content.includes('@someone')) {
             logger.info('Miku: ' + message.author.username + '(' + message.author.id + ') mentioned @someone');
             message.channel.send(commands.someone(logger, client, message));
