@@ -15,9 +15,7 @@ logger.level = process.argv[2];
 
 // Initialize Discord Bot
 logger.info('Connecting to Miku...');
-let client = new Discord.Client({
-    fetchAllMembers: true
-});
+let client = new Discord.Client();
 client.login(auth.token);
 client.once('ready', function (evt) {
     logger.info(`Connection to Miku successful! Logged in as: ${client.user.tag}`);
@@ -42,28 +40,28 @@ connection.connect(function(err) {
 client.on('message', message => {
     // Our bot needs to know if it will execute a command
     // It will listen for messages that will start with `h.`
-    let commandText = 'h.';
-    if (message.content.substring(0, commandText.length) === 'h.') {
-        let args = message.content.substring(commandText.length).split(/ +/);
-        let cmd = args[0];
+    if (message.author.id !== client.user.id) {
+        let commandText = 'h.';
+        if (message.content.substring(0, commandText.length) === 'h.') {
+            let args = message.content.substring(commandText.length).split(/ +/);
+            let cmd = args[0];
 
-        args = args.splice(1);
-        switch(cmd) {
-            case 'roll':
-                logger.info('Miku: Dice rolled by ' + message.author.username + '(' + message.author.id + ')');
-                message.reply(commands.roll(logger, message.author.id, args));
-                break;
-        }
-    } else {
-        // Give xp to everyone but the bot itself
-        if (message.author.id !== client.user.id) {
+            args = args.splice(1);
+            switch (cmd) {
+                case 'roll':
+                    logger.info('Miku: Dice rolled by ' + message.author.username + '(' + message.author.id + ')');
+                    message.reply(commands.roll(logger, message.author.id, args));
+                    break;
+            }
+        } else {
+            // Give xp to the user
             experience.message(logger, client, connection, message.author.id, message.channel);
-        }
 
-        // Mention a random person in the current text channel
-        if (message.content.includes('@someone')) {
-            logger.info('Miku: ' + message.author.username + '(' + message.author.id + ') mentioned @someone');
-            message.channel.send(commands.someone(logger, client, message));
+            // Mention a random person in the current text channel
+            if (message.content.includes('@someone')) {
+                logger.info('Miku: ' + message.author.username + '(' + message.author.id + ') mentioned @someone');
+                message.channel.send(commands.someone(logger, client, message));
+            }
         }
     }
 });
