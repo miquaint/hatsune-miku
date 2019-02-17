@@ -4,6 +4,8 @@ let logger = require('winston');
 let mysql = require('mysql');
 let auth = require('./auth.json');
 let commands = require('./commands.js');
+let experience = require('./experience');
+
 // Configure logger settings
 logger.remove(logger.transports.Console);
 logger.add(new logger.transports.Console, {
@@ -23,18 +25,18 @@ client.once('ready', function (evt) {
 
 // Connect to the mySQL server
 logger.info('Connection to mySQL database...');
-let con = mysql.createConnection({
+let connection = mysql.createConnection({
     host: auth.mysql_host,
     user: auth.mysql_user,
     password: auth.mysql_pass,
     database: auth.mysql_db
 });
-con.connect(function(err) {
+connection.connect(function(err) {
     if (err) {
         logger.error('Error connecting to mySQL database: ' + err.stack);
         return;
     }
-    logger.info('Connection to mySQL database successful! Connected as id ' + con.threadId);
+    logger.info('Connection to mySQL database successful! Connected as id ' + connection.threadId);
 });
 
 client.on('message', message => {
@@ -42,6 +44,9 @@ client.on('message', message => {
     // It will listen for messages that will start with `h.`
     if (message.content.substring(0, 2) === 'h.') {
         let args = message.content.substring(2).split(/ +/);
+    let commandText = 'h.';
+    if (message.substring(0, commandText.length) === 'h.') {
+        let args = message.substring(commandText.length).split(' ');
         let cmd = args[0];
 
         args = args.splice(1);
@@ -52,7 +57,10 @@ client.on('message', message => {
                 break;
         }
     } else {
-        //TODO: Experience system
+        // Give xp to everyone but the bot itself
+        if (userID !== bot.id) {
+            experience.message(logger, bot, connection, userID, channelID);
+
         if (message.content.includes('@someone')) {
             logger.info('Miku: ' + message.author.username + '(' + message.author.id + ') mentioned @someone');
             message.channel.send(commands.someone(logger, client, message));
