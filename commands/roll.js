@@ -45,7 +45,7 @@
 		logger.verbose('Roll: Values rolled: ' + values);
 		logger.verbose('Roll: Total value: ' + totalValue);
 
-		let message = '<@' + userID + '>, you rolled a **' + totalValue + '**.';
+		let message = ', you rolled a **' + totalValue + '**.';
 		if (numDice <= 100) {
 			message += '\nThe values on the die were: ' + valuesRolled + ' = *' + (totalValue - flatValue) + '*';
 		} else {
