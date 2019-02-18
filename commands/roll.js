@@ -1,5 +1,5 @@
 (function() {
-	module.exports.roll = function(logger, userID, args) {
+	module.exports.roll = function(logger, args, userID) {
 		let indexOfD = args[0].toLowerCase().indexOf('d');
 		if (indexOfD < 0) {
 			logger.debug('Roll: Handling incorrect syntax error');
@@ -25,7 +25,7 @@
 		let flatValue = args[2] ? Number(args[2]) : 0;
 		if (flatValue < 0) {
 			logger.debug('Roll: Handling negative flat value');
-			return 'Error: Flat value should be positive.';
+			return ' Error: Flat value should be positive.';
 		}
 
 		let totalValue = flatValue;
