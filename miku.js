@@ -1,4 +1,3 @@
-// let Discord = require('discord.io');
 let Discord = require('discord.js');
 let logger = require('winston');
 let mysql = require('mysql');
@@ -46,11 +45,22 @@ client.on('message', message => {
             let args = message.content.substring(commandText.length).split(/ +/);
             let cmd = args[0];
 
+            // Remove the command from the arguments
             args = args.splice(1);
             switch (cmd) {
                 case 'roll':
-                    logger.info('Miku: Dice rolled by ' + message.author.username + '(' + message.author.id + ')');
-                    message.reply(commands.roll(logger, message.author.id, args));
+                    logger.info('Miku: Dice rolled by ' + message.author.username + ' (' + message.author.id + ')');
+                    message.reply(commands.roll(logger, args, message.author.id));
+                    break;
+                case 'kick':
+                    logger.info('Miku: ' + message.author.username + ' (' + message.author.id +
+                      ') has kicked user(s) from ' + message.guild.name + ' (' + message.guild.id + ')');
+                    message.channel.send(commands.kick(logger, message.mentions.users, message.channel));
+                    break;
+                case 'ban':
+                    logger.info('Miku: ' + message.author.username + ' (' + message.author.id +
+                      ') has banned user(s) from ' + message.guild.name + ' (' + message.guild.id + ')');
+                    commands.ban(logger, message.mentions.users, message.channel);
                     break;
             }
         } else {
@@ -60,7 +70,7 @@ client.on('message', message => {
             // Mention a random person in the current text channel
             if (message.content.includes('@someone')) {
                 logger.info('Miku: ' + message.author.username + '(' + message.author.id + ') mentioned @someone');
-                message.channel.send(commands.someone(logger, client, message));
+                message.channel.send(commands.someone(logger, message));
             }
         }
     }

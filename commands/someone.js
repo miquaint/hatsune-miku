@@ -1,10 +1,9 @@
 (function() {
-    module.exports.someone = function(logger, client, message) {
+    module.exports.someone = function(logger, message) {
         let users = message.channel.members;
         users.forEach(isBot);
         let userID = randomUser(users)[0];
-        logger.debug('Someone: Possible @someone targets in next message');
-        logger.debug(users);
+
         logger.verbose('Someone: ' + userID + ' was selected as @someone');
 
         return '<@' + userID + '>, you are @someone ^';
