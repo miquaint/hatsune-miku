@@ -50,7 +50,7 @@ client.on('message', message => {
             switch (cmd) {
                 case 'roll':
                     logger.info('Miku: Dice rolled by ' + message.author.username + ' (' + message.author.id + ')');
-                    message.reply(commands.roll(logger, args, message.author.id));
+                    message.reply(commands.roll(logger, args));
                     break;
                 case 'kick':
                     logger.info('Miku: ' + message.author.username + ' (' + message.author.id +

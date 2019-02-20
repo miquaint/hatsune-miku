@@ -1,9 +1,11 @@
+const CORRECT_USAGE = '.roll (number_of_dice)d(number_of_sides) [[+/-] [flat_value]]';
+
 (function() {
-	module.exports.roll = function(logger, args, userID) {
+	module.exports.roll = function(logger, args) {
 		let indexOfD = args[0].toLowerCase().indexOf('d');
-		if (indexOfD < 0) {
+		if (indexOfD < 0 || (args.length !== 1 && args.length !== 3)) {
 			logger.debug('Roll: Handling incorrect syntax error');
-			return '.roll (number_of_dice)d(number_of_sides) [+ flat_value]';
+			return CORRECT_USAGE;
 		}
 
 		let numDice = Number(args[0].substring(0, indexOfD));
@@ -28,7 +30,7 @@
 			return ' Error: Flat value should be positive.';
 		}
 
-		let totalValue = flatValue;
+		let totalValue = args[1] === '+' ? flatValue : (-1 * flatValue);
 		let values = [];
 		let valuesRolled = '';
 		for (let i = 0; i < numDice; i++) {
@@ -52,7 +54,14 @@
 			message += '\nI do not show individual dice rolls for more than 100 dice.'
 		}
 		if (args[2]) {
-			message += '\n*' + (totalValue - flatValue) + '* + ' + flatValue + ' = **' + totalValue + '**'
+			switch (args[1]) {
+				case '-':
+					message += '\n*' + (totalValue - flatValue) + '* - ' + flatValue + ' = **' + totalValue + '**'
+					break;
+				case '+':
+					message += '\n*' + (totalValue - flatValue) + '* + ' + flatValue + ' = **' + totalValue + '**';
+					break;
+			}
 		}
 
 		return message;
