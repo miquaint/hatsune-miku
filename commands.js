@@ -5,8 +5,8 @@ let ban = require('./commands/ban.js');
 
 // h.roll
 (function() {
-	module.exports.roll = function(logger, args, userID) {
-		return roll.roll(logger, args, userID);
+	module.exports.roll = function(logger, args) {
+		return roll.roll(logger, args);
 	}
 }());
 

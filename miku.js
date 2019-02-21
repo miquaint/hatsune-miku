@@ -41,7 +41,7 @@ client.on('message', message => {
     // It will listen for messages that will start with `h.`
     if (message.author.id !== client.user.id) {
         let commandText = 'h.';
-        if (message.content.substring(0, commandText.length) === 'h.') {
+        if (message.content.substring(0, commandText.length) === commandText) {
             let args = message.content.substring(commandText.length).split(/ +/);
             let cmd = args[0];
 
@@ -50,7 +50,7 @@ client.on('message', message => {
             switch (cmd) {
                 case 'roll':
                     logger.info('Miku: Dice rolled by ' + message.author.username + ' (' + message.author.id + ')');
-                    message.reply(commands.roll(logger, args, message.author.id));
+                    message.reply(commands.roll(logger, args));
                     break;
                 case 'kick':
                     logger.info('Miku: ' + message.author.username + ' (' + message.author.id +
