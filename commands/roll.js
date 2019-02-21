@@ -1,35 +1,48 @@
-const CORRECT_USAGE = '.roll (number_of_dice)d(number_of_sides) [(+/-) (flat_value)]';
+const CORRECT_USAGE = '`.roll (number_of_dice)d(number_of_sides) [(+/-) (flat_value)]`';
+const MAX_DICE = 1000;
+const MAX_SIDES = 100000000000;
 
 (function() {
 	module.exports.roll = function(logger, args) {
 		let indexOfD = args[0].toLowerCase().indexOf('d');
-		if (indexOfD < 0 || (args.length !== 1 && args.length !== 3)) {
-			logger.debug('Roll: Handling incorrect syntax error');
-			return CORRECT_USAGE;
+		let numDice = Number(args[0].substring(0, indexOfD));
+		let numSides = parseFloat(args[0].substring(indexOfD + 1));
+		let hasFlatValue = !!args[2];
+		let flatValue = hasFlatValue ? Number(args[2]) : 0;
+
+		// Check # arguments and argument types
+		let wrongNumArguments = (args.length !== 1 && args.length !== 3);
+		let noD = indexOfD < 0;
+		if (isNaN(numDice) || isNaN(numSides) || isNaN(flatValue) || wrongNumArguments || noD) {
+			logger.debug('Roll: Handling incorrect syntax');
+			return 'Proper Usage:\n' + CORRECT_USAGE;
 		}
 
-		let numDice = Number(args[0].substring(0, indexOfD));
-		if (numDice < 0 || numDice > 1000) {
+		// Check number of dice
+		let wrongNumDice = numDice < 0 || numDice > MAX_DICE;
+		if (wrongNumDice) {
 			logger.debug('Roll: Handling invalid number of dice');
 			return 'Error: Number of dice must be between 1 and 1000.';
 		}
 
-		let numSides = parseFloat(args[0].substring(indexOfD + 1));
-		if (numSides <= 0 || numSides > 100000000000) {
+		// Check number of sides
+		let wrongNumSides = numSides <= 0 || numSides > MAX_SIDES;
+		if (wrongNumSides) {
 			logger.debug('Roll: Handling invalid number of sides');
 			return 'Error: Number of sides must be between 1 and 100000000000.';
 		}
-		if (numSides % 1 !== 0) {
+
+		// Check for fractions
+		let isFractionalNumSides = numSides % 1 !== 0;
+		if (isFractionalNumSides) {
 			logger.debug('Roll: Handling fraction of a side');
 			return 'Error: You can\'t have a fraction of a side. :angry:';
 		}
 
-		let hasFlatValue = !!args[2];
-
-		let flatValue = hasFlatValue ? Number(args[2]) : 0;
+		// Check for negative flat value (can just use subtraction)
 		if (flatValue < 0) {
 			logger.debug('Roll: Handling negative flat value');
-			return ' Error: Flat value should be positive.';
+			return ' Error: Flat value should be positive (you can just use subtraction).';
 		}
 
 		// 0 for wrong input, 1 for '+', 2 for '-'
@@ -44,7 +57,7 @@ const CORRECT_USAGE = '.roll (number_of_dice)d(number_of_sides) [(+/-) (flat_val
 					break;
 				default:
 					logger.debug('Roll: Handling wrong arithmetic symbol');
-					return 'Error: Second argument must be `+` or `-`';
+					return 'Error: Only `+` and `-` are supported.';
 			}
 		}
 
@@ -73,17 +86,20 @@ const CORRECT_USAGE = '.roll (number_of_dice)d(number_of_sides) [(+/-) (flat_val
 			} else { // Don't need to check for negative, if the argument was invalid the function would have returned above
 				message += (totalValue + flatValue) + '*';
 			}
-		} else {
+		} else if (numDice > 100) {
 			message += '\nI do not show individual dice rolls for more than 100 dice.'
 		}
 
-		message += '\n*';
-		if (arithmeticSymbol === 1) {
-			message += (totalValue - flatValue) + '* + ';
-		} else { // Don't need to check for negative, if the argument was invalid the function would have returned above
-			message += (totalValue + flatValue) + '* - ';
+		// If there is flat value math, show it
+		if (arithmeticSymbol) {
+			message += '\n*';
+			if (arithmeticSymbol === 1) {
+				message += (totalValue - flatValue) + '* + ';
+			} else if (arithmeticSymbol === 2) {
+				message +=  (totalValue + flatValue) + '* - ';
+			}
+			message += flatValue + ' = **' + totalValue + '**';
 		}
-		message += flatValue + ' = **' + totalValue + '**';
 
 		return message;
 	}
