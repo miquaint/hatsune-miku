@@ -1,48 +1,66 @@
 const CORRECT_USAGE = '`.roll (number_of_dice)d(number_of_sides) [(+/-) (flat_value)]`';
+
 const MAX_DICE = 1000;
+const MAX_DICE_TO_DISPLAY = 100;
 const MAX_SIDES = 100000000000;
 
+function usage(message) {
+	message.channel.send('**Proper Usage:**\n' + CORRECT_USAGE);
+}
+
 (function() {
-	module.exports.roll = function(logger, args) {
+	module.exports.roll = function(message, logger, args) {
+		// Check # arguments
+		let wrongNumArguments = (args.length !== 1 && args.length !== 3);
+		if (wrongNumArguments) {
+			logger.debug('Roll: Handling incorrect syntax');
+			usage(message);
+			return;
+		}
+
 		let indexOfD = args[0].toLowerCase().indexOf('d');
 		let numDice = Number(args[0].substring(0, indexOfD));
 		let numSides = parseFloat(args[0].substring(indexOfD + 1));
 		let hasFlatValue = !!args[2];
 		let flatValue = hasFlatValue ? Number(args[2]) : 0;
 
-		// Check # arguments and argument types
-		let wrongNumArguments = (args.length !== 1 && args.length !== 3);
+		// Check argument types
 		let noD = indexOfD < 0;
-		if (isNaN(numDice) || isNaN(numSides) || isNaN(flatValue) || wrongNumArguments || noD) {
+		if (isNaN(numDice) || isNaN(numSides) || isNaN(flatValue) || noD) {
 			logger.debug('Roll: Handling incorrect syntax');
-			return 'Proper Usage:\n' + CORRECT_USAGE;
+			usage(message);
+			return;
 		}
 
 		// Check number of dice
 		let wrongNumDice = numDice < 0 || numDice > MAX_DICE;
 		if (wrongNumDice) {
 			logger.debug('Roll: Handling invalid number of dice');
-			return 'Error: Number of dice must be between 1 and 1000.';
+			message.channel.send('Error: Number of dice must be between 1 and 1000.');
+			return;
 		}
 
 		// Check number of sides
 		let wrongNumSides = numSides <= 0 || numSides > MAX_SIDES;
 		if (wrongNumSides) {
 			logger.debug('Roll: Handling invalid number of sides');
-			return 'Error: Number of sides must be between 1 and 100000000000.';
+			message.channel.send('Error: Number of sides must be between 1 and 100000000000.');
+			return;
 		}
 
 		// Check for fractions
 		let isFractionalNumSides = numSides % 1 !== 0;
 		if (isFractionalNumSides) {
 			logger.debug('Roll: Handling fraction of a side');
-			return 'Error: You can\'t have a fraction of a side. :angry:';
+			message.reply('you can\'t have a fraction of a side. :angry:');
+			return;
 		}
 
 		// Check for negative flat value (can just use subtraction)
 		if (flatValue < 0) {
 			logger.debug('Roll: Handling negative flat value');
-			return ' Error: Flat value should be positive (you can just use subtraction).';
+			message.channel.send('Error: Flat value should be positive (you can just use subtraction).');
+			return;
 		}
 
 		// 0 for wrong input, 1 for '+', 2 for '-'
@@ -57,7 +75,8 @@ const MAX_SIDES = 100000000000;
 					break;
 				default:
 					logger.debug('Roll: Handling wrong arithmetic symbol');
-					return 'Error: Only `+` and `-` are supported.';
+					message.channel.send('Error: Only `+` and `-` are supported.');
+					return;
 			}
 		}
 
@@ -78,29 +97,29 @@ const MAX_SIDES = 100000000000;
 		logger.verbose('Roll: Values rolled: ' + values);
 		logger.verbose('Roll: Total value: ' + totalValue);
 
-		let message = 'you rolled a **' + totalValue + '**.';
-		if (numDice > 1 && numDice <= 100) {
-			message += '\nThe values on the die were: ' + valuesRolled + ' = *';
+		let response = 'you rolled a **' + totalValue + '**.';
+		if (numDice > 1 && numDice <= MAX_DICE_TO_DISPLAY) {
+			response += '\nThe values on the die were: ' + valuesRolled + ' = *';
 			if (arithmeticSymbol === 1) {
-				message += (totalValue - flatValue) + '*';
+				response += (totalValue - flatValue) + '*';
 			} else { // Don't need to check for negative, if the argument was invalid the function would have returned above
-				message += (totalValue + flatValue) + '*';
+				response += (totalValue + flatValue) + '*';
 			}
-		} else if (numDice > 100) {
-			message += '\nI do not show individual dice rolls for more than 100 dice.'
+		} else if (numDice > MAX_DICE_TO_DISPLAY) {
+			response += '\nI do not show individual dice rolls for more than 100 dice.'
 		}
 
 		// If there is flat value math, show it
 		if (arithmeticSymbol) {
-			message += '\n*';
+			response += '\n*';
 			if (arithmeticSymbol === 1) {
-				message += (totalValue - flatValue) + '* + ';
+				response += (totalValue - flatValue) + '* + ';
 			} else if (arithmeticSymbol === 2) {
-				message +=  (totalValue + flatValue) + '* - ';
+				response +=  (totalValue + flatValue) + '* - ';
 			}
-			message += flatValue + ' = **' + totalValue + '**';
+			response += flatValue + ' = **' + totalValue + '**';
 		}
 
-		return message;
+		message.reply(response);
 	}
 }());
