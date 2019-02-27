@@ -13,7 +13,7 @@ function usage(message) {
 		// Check # arguments
 		let wrongNumArguments = (args.length !== 1 && args.length !== 3);
 		if (wrongNumArguments) {
-			logger.debug('Roll: Handling incorrect syntax');
+			logger.debug('Roll: Handling incorrect usage');
 			usage(message);
 			return;
 		}
@@ -27,7 +27,7 @@ function usage(message) {
 		// Check argument types
 		let noD = indexOfD < 0;
 		if (isNaN(numDice) || isNaN(numSides) || isNaN(flatValue) || noD) {
-			logger.debug('Roll: Handling incorrect syntax');
+			logger.debug('Roll: Handling incorrect usage');
 			usage(message);
 			return;
 		}
