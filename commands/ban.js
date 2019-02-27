@@ -1,5 +1,16 @@
+const CORRECT_USAGE = '`.ban @user [@additionalUser(s)]`';
+
+function usage(message) {
+    message.channel.send('**Proper Usage:**\n' + CORRECT_USAGE);
+}
+
 (function() {
     module.exports.ban = function(message, logger, targets) {
+        if (targets.size === 0) {
+            logger.debug('Ban: Handling incorrect usage');
+            usage(message);
+            return;
+        }
         for (var [key, value] of targets) {
             let targetKey = key;
             let targetValue = value;
