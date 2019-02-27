@@ -3,17 +3,17 @@ let someone = require('./commands/someone.js');
 let kick = require('./commands/kick.js');
 let ban = require('./commands/ban.js');
 
-// h.roll
-(function() {
-	module.exports.roll = function(message, logger, args) {
-		roll.roll(message, logger, args);
-	}
-}());
-
 // @someone
 (function() {
 	module.exports.someone = function(message, logger) {
 		return someone.someone(message, logger);
+	}
+}());
+
+// h.ban
+(function() {
+	module.exports.ban = function(message, logger, targets) {
+		return ban.ban(message, logger, targets);
 	}
 }());
 
@@ -24,9 +24,9 @@ let ban = require('./commands/ban.js');
 	}
 }());
 
-// h.ban
+// h.roll
 (function() {
-	module.exports.ban = function(message, logger, targets) {
-		return ban.ban(message, logger, targets);
+	module.exports.roll = function(message, logger, args) {
+		roll.roll(message, logger, args);
 	}
 }());
