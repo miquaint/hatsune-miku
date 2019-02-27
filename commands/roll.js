@@ -5,7 +5,7 @@ const MAX_DICE_TO_DISPLAY = 100;
 const MAX_SIDES = 100000000000;
 
 function usage(message) {
-	message.channel.send('**Proper Usage:**\n' + CORRECT_USAGE);
+	message.channel.send('**Proper Usage of Roll:**\n' + CORRECT_USAGE);
 }
 
 (function() {

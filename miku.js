@@ -5,6 +5,8 @@ let auth = require('./auth.json');
 let commands = require('./commands.js');
 let experience = require('./experience');
 
+const HELP_USAGE = '`.help command`';
+
 // Configure logger settings
 logger.remove(logger.transports.Console);
 logger.add(new logger.transports.Console, {
@@ -40,7 +42,7 @@ client.on('message', message => {
     // Our bot needs to know if it will execute a command
     // It will listen for messages that will start with `h.`
     if (message.author.id !== client.user.id) {
-        let commandText = 'ht.';
+        let commandText = 'h.';
         if (message.content.substring(0, commandText.length) === commandText) {
             let args = message.content.substring(commandText.length).split(/ +/);
             let cmd = args[0];
@@ -48,19 +50,26 @@ client.on('message', message => {
             // Remove the command from the arguments
             args = args.splice(1);
             switch (cmd) {
-                case 'roll':
-                    logger.info('Miku: Dice rolled by ' + message.author.username + ' (' + message.author.id + ')');
-                    commands.roll(message, logger, args);
+                case 'ban':
+                    logger.info('Miku: ' + message.author.username + ' (' + message.author.id +
+                        ') has banned user(s) from ' + message.guild.name + ' (' + message.guild.id + ')');
+                    commands.ban(message, logger, message.mentions.users);
+                    break;
+                case 'help':
+                    if (args[0]) {
+
+                    } else {
+
+                    }
                     break;
                 case 'kick':
                     logger.info('Miku: ' + message.author.username + ' (' + message.author.id +
-                      ') has kicked user(s) from ' + message.guild.name + ' (' + message.guild.id + ')');
+                        ') has kicked user(s) from ' + message.guild.name + ' (' + message.guild.id + ')');
                     commands.kick(message, logger, message.mentions.users);
                     break;
-                case 'ban':
-                    logger.info('Miku: ' + message.author.username + ' (' + message.author.id +
-                      ') has banned user(s) from ' + message.guild.name + ' (' + message.guild.id + ')');
-                    commands.ban(message, logger, message.mentions.users);
+                case 'roll':
+                    logger.info('Miku: Dice rolled by ' + message.author.username + ' (' + message.author.id + ')');
+                    commands.roll(message, logger, args);
                     break;
             }
         } else {
