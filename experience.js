@@ -1,23 +1,3 @@
-(function() {
-    module.exports.message = function(logger, client, connection, userID, channel) {
-        let sql = 'SELECT * FROM users WHERE id = ?';
-        connection.query(sql, [userID], function(error, results, fields) {
-            if (error) {
-                logger.error('Error identifying user for experience: ' + error.stack);
-                return;
-            }
-
-            if (results.length === 0) {
-                newUser(logger, connection, userID);
-                // Since the results were empty, populate them with the new data
-                // Same as the values in newUser
-                results = [{level: 1, total_exp: 0, current_exp: 0, required_exp: 61}];
-            }
-            gainExp(logger, client, connection, userID, channel, results);
-        });
-    }
-}());
-
 function newUser(logger, connection, userID) {
     logger.verbose('Experience: ' + userID + ' is a new user! Adding them to the database...');
     // level = 1
@@ -27,7 +7,7 @@ function newUser(logger, connection, userID) {
     let sql = 'INSERT INTO users VALUES (?, 1, 0, 0, 61)';
     connection.query(sql, [userID], function(error, results, fields) {
         if (error) {
-            logger.error('Error adding new user for experience: ' + error.stack);
+            logger.error('Experience: Error adding new user for experience: ' + error.stack);
             return;
         }
 
@@ -44,9 +24,9 @@ function gainExp(logger, client, connection, userID, channel, userInfo) {
 
     let sql = 'UPDATE users SET level = ?, total_exp = ?, current_exp = ?, required_exp = ? WHERE id = ?';
     connection.query(sql, [userInfo[0].level, userInfo[0].total_exp, userInfo[0].current_exp, userInfo[0].required_exp,
-      userID], function(error, results, fields) {
+        userID], function(error, results, fields) {
         if (error) {
-            logger.error('Error giving user experience: ' + error.stack);
+            logger.warning('Experience: Error giving user experience: ' + error.stack);
             return;
         }
 
@@ -61,3 +41,23 @@ function levelUp(logger, client, userID, channel, userInfo) {
     channel.send('Gratz <@' + userID + '>! You reached level **' + userInfo[0].level + '**!');
     logger.verbose('Experience: ' + userID + ' just hit level ' + userInfo[0].level);
 }
+
+(function() {
+    module.exports.message = function(logger, client, connection, userID, channel) {
+        let sql = 'SELECT * FROM users WHERE id = ?';
+        connection.query(sql, [userID], function(error, results, fields) {
+            if (error) {
+                logger.warning('Experience: Error identifying user for experience: ' + error.stack);
+                return;
+            }
+
+            if (results.length === 0) {
+                newUser(logger, connection, userID);
+                // Since the results were empty, populate them with the new data
+                // Same as the values in newUser
+                results = [{level: 1, total_exp: 0, current_exp: 0, required_exp: 61}];
+            }
+            gainExp(logger, client, connection, userID, channel, results);
+        });
+    }
+}());
