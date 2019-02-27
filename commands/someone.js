@@ -1,12 +1,12 @@
 (function() {
-    module.exports.someone = function(logger, message) {
+    module.exports.someone = function(message, logger) {
         let users = message.channel.members;
         users.forEach(isBot);
         let userID = randomUser(users)[0];
 
         logger.verbose('Someone: ' + userID + ' was selected as @someone');
-
-        return '<@' + userID + '>, you are @someone ^';
+        message.channel.send('<@' + userID + '>, you are @someone ^');
+        return;
     }
 }());
 

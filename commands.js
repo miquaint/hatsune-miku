@@ -5,28 +5,28 @@ let ban = require('./commands/ban.js');
 
 // h.roll
 (function() {
-	module.exports.roll = function(logger, args) {
-		return roll.roll(logger, args);
+	module.exports.roll = function(message, logger, args) {
+		roll.roll(message, logger, args);
 	}
 }());
 
 // @someone
 (function() {
-	module.exports.someone = function(logger, message) {
-		return someone.someone(logger, message);
+	module.exports.someone = function(message, logger) {
+		return someone.someone(message, logger);
 	}
 }());
 
 // h.kick
 (function() {
-	module.exports.kick = function(logger, targets, channel) {
-		return kick.kick(logger, targets, channel);
+	module.exports.kick = function(message, logger, targets) {
+		return kick.kick(message, logger, targets);
 	}
 }());
 
 // h.ban
 (function() {
-	module.exports.ban = function(logger, targets, channel) {
-		return ban.ban(logger, targets, channel);
+	module.exports.ban = function(message, logger, targets) {
+		return ban.ban(message, logger, targets);
 	}
 }());

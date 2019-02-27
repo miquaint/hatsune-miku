@@ -1,15 +1,17 @@
 (function() {
-    module.exports.kick = function(logger, targets, channel) {
+    module.exports.kick = function(message, logger, targets) {
         for (var [key, value] of targets) {
-            channel.members.get(key).kick()
-              .then(() => {
-                  logger.info('Kick: Kicked ' + value.username + ' (' + key + ')');
-                  channel.send(value.username + ' (' + key + ') has been kicked.');
-              })
-              .catch(() => {
-                  logger.error('Error kicking ' + value.username + ' (' + key + ')');
-                  channel.send('Error kicking ' + value.username + ' (' + key + ')');
-              });
+            let targetKey = key;
+            let targetValue = value;
+            message.channel.members.get(targetKey).kick()
+                .then(() => {
+                    logger.info('Kick: Kicked ' + targetValue.username + ' (' + targetKey + ') from ' + message.guild.name + ' (' + message.guild.id + ')');
+                    message.channel.send(targetValue.username + ' (' + targetKey + ') has been kicked.');
+                })
+                .catch(() => {
+                    logger.error('Error kicking ' + targetValue.username + ' (' + targetKey + ') from ' + message.guild.name + ' (' + message.guild.id + ')');
+                    message.channel.send('Error kicking ' + targetValue.username + ' (' + targetKey + '). Does Miku have that permission?');
+                });
         }
     }
 }());
