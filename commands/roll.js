@@ -1,20 +1,28 @@
-const CORRECT_USAGE = '`.roll (number_of_dice)d(number_of_sides) [(+/-) (flat_value)]`';
+const CORRECT_USAGE = '`roll [number_of_dice]d[number_of_sides] ((+/-) flat_value)`';
 
 const MAX_DICE = 1000;
 const MAX_DICE_TO_DISPLAY = 100;
 const MAX_SIDES = 100000000000;
 
-function usage(message) {
-	message.channel.send('**Proper Usage:**\n' + CORRECT_USAGE);
+function usage() {
+	return 'Proper Usage of **Roll**:\n' + CORRECT_USAGE;
 }
 
 (function() {
-	module.exports.roll = function(message, logger, args) {
+	module.exports.name = 'roll';
+
+	module.exports.help = function() {
+		return usage() + '\n\n**number_of_dice:** The number of dice to roll' +
+			'\n**number_of_sides:** The number of sides on each dice' +
+			'\n**(+/-) flat_value:** Add or subtract a value to the result on the dice rolls';
+	};
+
+	module.exports.execute = function(message, logger, args) {
 		// Check # arguments
 		let wrongNumArguments = (args.length !== 1 && args.length !== 3);
 		if (wrongNumArguments) {
 			logger.debug('Roll: Handling incorrect usage');
-			usage(message);
+			message.channel.send(usage());
 			return;
 		}
 
@@ -28,7 +36,7 @@ function usage(message) {
 		let noD = indexOfD < 0;
 		if (isNaN(numDice) || isNaN(numSides) || isNaN(flatValue) || noD) {
 			logger.debug('Roll: Handling incorrect usage');
-			usage(message);
+			message.channel.send(usage());
 			return;
 		}
 
@@ -121,5 +129,5 @@ function usage(message) {
 		}
 
 		message.reply(response);
-	}
+	};
 }());

@@ -1,14 +1,21 @@
-const CORRECT_USAGE = '`.kick @user [@additionalUser(s)]`';
+const CORRECT_USAGE = '`kick [@user] (@additionalUser(s))`';
 
-function usage(message) {
-    message.channel.send('**Proper Usage:**\n' + CORRECT_USAGE);
+function usage() {
+    return 'Proper Usage of **Kick**:\n' + CORRECT_USAGE;
 }
 
 (function() {
-    module.exports.kick = function(message, logger, targets) {
+    module.exports.name = 'kick';
+
+    module.exports.help = function() {
+        return usage() + '\n\n**@user:** The user to kick from the server (make sure you are mentioning them)' +
+            '\n**@additionalUser(s):** Any additional users to kick from the server (make sure you are mentioning them)';
+    };
+
+    module.exports.execute = function(message, logger, targets) {
         if (targets.size === 0) {
             logger.debug('Kick: Handling incorrect usage');
-            usage(message);
+            message.channel.send(usage());
             return;
         }
         for (var [key, value] of targets) {
@@ -20,9 +27,9 @@ function usage(message) {
                     message.channel.send(targetValue.username + ' (' + targetKey + ') has been kicked.');
                 })
                 .catch(() => {
-                    logger.error('Error kicking ' + targetValue.username + ' (' + targetKey + ') from ' + message.guild.name + ' (' + message.guild.id + ')');
+                    logger.warning('Kick: Error kicking ' + targetValue.username + ' (' + targetKey + ') from ' + message.guild.name + ' (' + message.guild.id + ')');
                     message.channel.send('Error kicking ' + targetValue.username + ' (' + targetKey + '). Does Miku have that permission?');
                 });
         }
-    }
+    };
 }());
