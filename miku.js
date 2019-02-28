@@ -79,7 +79,7 @@ client.on('message', message => {
             }
         } else {
             // Give xp to the user
-            experience.message(logger, client, connection, message.author.id, message.channel);
+            experience.message(message, logger, connection);
 
             // Mention a random person in the current text channel
             if (message.content.includes('@someone')) {
