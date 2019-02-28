@@ -1,32 +1,14 @@
-let roll = require('./commands/roll.js');
-let someone = require('./commands/someone.js');
-let kick = require('./commands/kick.js');
 let ban = require('./commands/ban.js');
+let kick = require('./commands/kick.js');
+let roll = require('./commands/roll.js');
 
-// h.roll
 (function() {
-	module.exports.roll = function(logger, args, userID) {
-		return roll.roll(logger, args, userID);
-	}
-}());
+	// ban
+	module.exports.ban = ban;
 
-// @someone
-(function() {
-	module.exports.someone = function(logger, message) {
-		return someone.someone(logger, message);
-	}
-}());
+	// kick
+	module.exports.kick = kick;
 
-// h.kick
-(function() {
-	module.exports.kick = function(logger, targets, channel) {
-		return kick.kick(logger, targets, channel);
-	}
-}());
-
-// h.ban
-(function() {
-	module.exports.ban = function(logger, targets, channel) {
-		return ban.ban(logger, targets, channel);
-	}
+	// roll
+	module.exports.roll = roll;
 }());
