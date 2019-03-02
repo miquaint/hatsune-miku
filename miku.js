@@ -41,8 +41,8 @@ connection.connect(function(err) {
 client.on('message', message => {
     // Our bot needs to know if it will execute a command
     // It will listen for messages that will start with `h.`
-    if (message.author.id !== client.user.id && !message.author.bot) {
-        let command_selector = 'h.';
+    if (!message.author.bot) {
+        let command_selector = 'ht.';
         if (message.content.substring(0, command_selector.length) === command_selector) {
             let args = message.content.substring(command_selector.length).split(/ +/);
             let cmd = args[0];
@@ -71,6 +71,11 @@ client.on('message', message => {
                     logger.info('Miku: ' + message.author.username + ' (' + message.author.id +
                         ') has kicked user(s) from ' + message.guild.name + ' (' + message.guild.id + ')');
                     commands.kick.execute(message, logger, message.mentions.users);
+                    break;
+                case 'purge':
+                    logger.info('Miku: ' + message.author.username + ' (' + message.author.id +
+                        ') has purged messages from ' + message.guild.name + ' (' + message.guild.id + ')');
+                    commands.purge.execute(message, logger, args);
                     break;
                 case 'roll':
                     logger.verbose('Miku: Dice rolled by ' + message.author.username + ' (' + message.author.id + ')');
