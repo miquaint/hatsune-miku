@@ -42,7 +42,7 @@ client.on('message', message => {
     // Our bot needs to know if it will execute a command
     // It will listen for messages that will start with `h.`
     if (!message.author.bot) {
-        let command_selector = 'h.';
+        let command_selector = 'ht.';
         if (message.content.substring(0, command_selector.length) === command_selector) {
             let args = message.content.substring(command_selector.length).split(/ +/);
             let cmd = args[0];
@@ -52,7 +52,7 @@ client.on('message', message => {
             switch (cmd) {
                 case 'ban':
                     logger.info('Miku: ' + message.author.username + ' (' + message.author.id +
-                        ') has banned user(s) from ' + message.guild.name + ' (' + message.guild.id + ')');
+                        ') has used the "ban" command in ' + message.guild.name + ' (' + message.guild.id + ')');
                     commands.ban.execute(message, logger, message.mentions.users);
                     break;
                 case 'help':
@@ -69,16 +69,16 @@ client.on('message', message => {
                     break;
                 case 'kick':
                     logger.info('Miku: ' + message.author.username + ' (' + message.author.id +
-                        ') has kicked user(s) from ' + message.guild.name + ' (' + message.guild.id + ')');
+                        ') has used the "kick" command in ' + message.guild.name + ' (' + message.guild.id + ')');
                     commands.kick.execute(message, logger, message.mentions.users);
                     break;
                 case 'purge':
-                    logger.info('Miku: ' + message.author.username + ' (' + message.author.id +
-                        ') has purged messages from ' + message.guild.name + ' (' + message.guild.id + ')');
+                    logger.verbose('Miku: ' + message.author.username + ' (' + message.author.id +
+                        ') has used the "purge" command in ' + message.guild.name + ' (' + message.guild.id + ')');
                     commands.purge.execute(message, logger, args);
                     break;
                 case 'roll':
-                    logger.verbose('Miku: Dice rolled by ' + message.author.username + ' (' + message.author.id + ')');
+                    logger.silly('Miku: Dice rolled by ' + message.author.username + ' (' + message.author.id + ')');
                     commands.roll.execute(message, logger, args);
                     break;
             }

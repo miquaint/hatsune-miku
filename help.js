@@ -1,6 +1,6 @@
 let commands = require('./commands');
 
-const USAGE = '`help [command_name]`';
+const USAGE = '`help command_name`';
 
 function bulkHelp(message, logger) {
     message.author.createDM()
