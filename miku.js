@@ -42,7 +42,7 @@ client.on('message', message => {
     // Our bot needs to know if it will execute a command
     // It will listen for messages that will start with `h.`
     if (!message.author.bot) {
-        let command_selector = 'ht.';
+        let command_selector = 'h.';
         if (message.content.substring(0, command_selector.length) === command_selector) {
             let args = message.content.substring(command_selector.length).split(/ +/);
             let cmd = args[0];
