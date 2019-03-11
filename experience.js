@@ -19,7 +19,6 @@ function newUser(message, logger, connection) {
 
 function gainExp(message, logger, connection, userInfo) {
     // Increase total_exp and current_exp and check to see if the user has leveled up
-    console.log(userInfo);
     userInfo[0].total_exp += EXP_MODIFIER;
     userInfo[0].current_exp += EXP_MODIFIER;
     if (userInfo[0].current_exp >= userInfo[0].required_exp) {
@@ -50,7 +49,6 @@ function levelUp(message, logger, userInfo) {
     module.exports.message = function(message, logger, connection) {
         let sql = 'SELECT * FROM users WHERE id = ?';
         connection.query(sql, [message.author.id], function(error, results, fields) {
-            console.log(results);
             if (error) {
                 logger.warning('Experience: Error identifying user for experience: ' + error.stack);
                 return;
