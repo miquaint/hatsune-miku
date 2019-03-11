@@ -1,4 +1,4 @@
-const CORRECT_USAGE = '`roll [number_of_dice]d[number_of_sides] ((+/-) flat_value)`';
+const CORRECT_USAGE = '`roll (number_of_dice)d(number_of_sides) [(+/-) flat_value]`';
 
 const MAX_DICE = 1000;
 const MAX_DICE_TO_DISPLAY = 100;
@@ -71,7 +71,7 @@ function usage() {
 			return;
 		}
 
-		// 0 for wrong input, 1 for '+', 2 for '-'
+		// 0 for wrong or no input, 1 for '+', 2 for '-'
 		let arithmeticSymbol = 0;
 		if (args[1]) {
 			switch (args[1]) {
@@ -102,8 +102,8 @@ function usage() {
 		logger.silly('Roll: Index of "d": ' + indexOfD);
 		logger.debug('Roll: Number of dice: ' + numDice);
 		logger.debug('Roll: Number of sides: ' + numSides);
-		logger.verbose('Roll: Values rolled: ' + values);
-		logger.verbose('Roll: Total value: ' + totalValue);
+		logger.debug('Roll: Values rolled: ' + values);
+		logger.debug('Roll: Total value: ' + totalValue);
 
 		let response = 'you rolled a **' + totalValue + '**.';
 		if (numDice > 1 && numDice <= MAX_DICE_TO_DISPLAY) {
