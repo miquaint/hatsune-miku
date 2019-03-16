@@ -12,7 +12,11 @@ function usage() {
             '\n**@additionalUser(s):** Any additional users to ban from the server (make sure you are mentioning them)';
     };
 
-    module.exports.execute = function(message, logger, targets) {
+    module.exports.dm = function(message, logger) {
+        message.channel.send('You can\t ban people from a DM. Perhaps you want to block them?');
+    };
+
+    module.exports.guild = function(message, logger, targets) {
         if (message.member.permissions.has("BAN_MEMBERS")) {
             if (targets.size === 0) {
                 logger.debug('Ban: Handling incorrect usage');
@@ -24,13 +28,13 @@ function usage() {
                 let targetValue = value;
                 message.channel.members.get(targetKey).ban()
                     .then(() => {
-                        logger.info('Ban: Banned ' + targetValue.username + ' (' + targetKey + ') from  '
+                        logger.verbose('Ban: Banned ' + targetValue.username + ' (' + targetKey + ') from  '
                             + message.guild.name + ' (' + message.guild.id + ')');
                         message.channel.send(targetValue.username + ' (' + targetKey + ') has been banned.');
                     })
-                    .catch(() => {
+                    .catch((err) => {
                         logger.warning('Ban: Error banning ' + targetValue.username + ' (' + targetKey + ') from '
-                            + message.guild.name + ' (' + message.guild.id + ')');
+                            + message.guild.name + ' (' + message.guild.id + ')\n' + err.stack);
                         message.channel.send('Error banning ' + targetValue.username + ' (' + targetKey
                             + '). Do you and Miku have that permission?');
                     });
@@ -43,10 +47,10 @@ function usage() {
                     response.send('You don\'t have the correct permissions (BAN_MEMBERS) to ban users from **'
                         + message.guild.name + '**.');
                 })
-                .catch(() => {
-                    logger.error('Ban: Error scolding ' + message.author.username + ' (' + message.author.id
+                .catch((err) => {
+                    logger.warning('Ban: Error scolding ' + message.author.username + ' (' + message.author.id
                         + ') for attempting to ban someone from ' + message.guild.name + ' ('
-                        + message.guild.id + ') when they don\'t have the permission');
+                        + message.guild.id + ') when they don\'t have the permission\n' + err.stack);
                 });
         }
     };

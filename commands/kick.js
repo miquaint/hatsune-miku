@@ -12,7 +12,11 @@ function usage() {
             '\n**@additionalUser(s):** Any additional users to kick from the server (make sure you are mentioning them)';
     };
 
-    module.exports.execute = function(message, logger, targets) {
+    module.exports.dm = function(message, logger) {
+        message.channel.send('You can\t kick people from a DM. Perhaps you want to block them?');
+    };
+
+    module.exports.guild = function(message, logger, targets) {
         if (message.member.permissions.has("KICK_MEMBERS")) {
             if (targets.size === 0) {
                 logger.debug('Kick: Handling incorrect usage');
@@ -24,13 +28,13 @@ function usage() {
                 let targetValue = value;
                 message.channel.members.get(targetKey).kick()
                     .then(() => {
-                        logger.info('Kick: Kicked ' + targetValue.username + ' (' + targetKey + ') from '
+                        logger.verbose('Kick: Kicked ' + targetValue.username + ' (' + targetKey + ') from '
                             + message.guild.name + ' (' + message.guild.id + ')');
                         message.channel.send(targetValue.username + ' (' + targetKey + ') has been kicked.');
                     })
-                    .catch(() => {
+                    .catch((err) => {
                         logger.warning('Kick: Error kicking ' + targetValue.username + ' (' + targetKey + ') from '
-                            + message.guild.name + ' (' + message.guild.id + ')');
+                            + message.guild.name + ' (' + message.guild.id + ')\n' + err.stack);
                         message.channel.send('Error kicking ' + targetValue.username + ' (' + targetKey
                             + '). Do you and Miku have that permission?');
                     });
@@ -43,10 +47,10 @@ function usage() {
                     response.send('You don\'t have the correct permissions (KICK_MEMBERS) to kick users from **'
                         + message.guild.name + '**.');
                 })
-                .catch(() => {
-                    logger.error('Kick: Error scolding ' + message.author.username + ' (' + message.author.id
+                .catch((err) => {
+                    logger.warning('Kick: Error scolding ' + message.author.username + ' (' + message.author.id
                         + ') for attempting to kick someone from ' + message.guild.name + ' ('
-                        + message.guild.id + ') when they don\'t have the permission');
+                        + message.guild.id + ') when they don\'t have the permission\n' + err.stack);
                 });
         }
     };

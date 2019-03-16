@@ -11,7 +11,11 @@ function usage() {
         return usage() + '\n\n**numMessages:** The number of messages to purge between 1 and 99';
     };
 
-    module.exports.execute = function(message, logger, args) {
+    module.exports.dm = function(message, logger) {
+        message.channel.send('You can\'t purge message from a DM.');
+    };
+
+    module.exports.guild = function(message, logger, args) {
         if (message.member.permissions.has("MANAGE_MESSAGES")) {
             // Check # and type of arguments
             let wrongNumArguments = (args.length !== 1);
@@ -30,9 +34,9 @@ function usage() {
             }
 
             message.channel.bulkDelete(numToPurge + 1)
-                .catch(err => {
+                .catch((err) => {
                     logger.warning('Purge: Error purging messages from ' + message.channel.name + ' (' +
-                        message.channel.id + ')');
+                        message.channel.id + ')\n' + err.stack);
                     message.channel.send('Error purging the most recent ' + numToPurge
                         + ' messages. Do you and Miku have that permission?');
                 });
@@ -44,11 +48,11 @@ function usage() {
                     response.send('You don\'t have the correct permissions (MANAGE_MESSAGES) to purge messages from **'
                         + message.guild.name + ' - ' + message.channel.name + '**.');
                 })
-                .catch(() => {
-                    logger.error('Purge: Error scolding ' + message.author.username + ' (' + message.author.id
+                .catch((err) => {
+                    logger.warning('Purge: Error scolding ' + message.author.username + ' (' + message.author.id
                         + ') for attempting to purge messages from ' + message.guild.name + ' (' + message.guild.id
                         + ' ) - ' + message.channel.name + ' (' + message.channel.id
-                        + ') when they don\t have the permission');
+                        + ') when they don\t have the permission\n' + err.stack);
                 });
         }
     };

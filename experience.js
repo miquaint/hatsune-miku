@@ -8,8 +8,8 @@ function newUser(message, logger, connection) {
     let sql = 'INSERT INTO users VALUES (?, ?, ?, ?, ?)';
     connection.query(sql, [message.author.id, START_LEVEL, EXP_RESET, EXP_RESET, (LEVEL_SCALING + START_LEVEL) * EXP_MODIFIER],
         function(error, results, fields) {
-            if (error) {
-                logger.error('Experience: Error adding new user for experience: ' + error.stack);
+            if (err) {
+                logger.error('Experience: Error adding new user for experience:\n' + err.stack);
                 return;
             }
 
@@ -29,7 +29,7 @@ function gainExp(message, logger, connection, userInfo) {
     connection.query(sql, [userInfo[0].level, userInfo[0].total_exp, userInfo[0].current_exp, userInfo[0].required_exp,
         message.author.id], function(error, results, fields) {
             if (error) {
-                logger.warning('Experience: Error giving user experience: ' + error.stack);
+                logger.warning('Experience: Error giving user experience:\n' + error.stack);
                 return;
             }
 
@@ -38,7 +38,7 @@ function gainExp(message, logger, connection, userInfo) {
 }
 
 function levelUp(message, logger, userInfo) {
-    logger.verbose('Experience: ' + message.author.username + ' (' + message.author.id + ') just hit level ' + userInfo[0].level);
+    logger.silly('Experience: ' + message.author.username + ' (' + message.author.id + ') just hit level ' + userInfo[0].level);
     userInfo[0].current_exp = EXP_RESET;
     userInfo[0].required_exp += (LEVEL_SCALING + userInfo[0].level) * EXP_MODIFIER;
     userInfo[0].level++;
@@ -50,7 +50,7 @@ function levelUp(message, logger, userInfo) {
         let sql = 'SELECT * FROM users WHERE id = ?';
         connection.query(sql, [message.author.id], function(error, results, fields) {
             if (error) {
-                logger.warning('Experience: Error identifying user for experience: ' + error.stack);
+                logger.warning('Experience: Error identifying user for experience:\n' + error.stack);
                 return;
             }
 
