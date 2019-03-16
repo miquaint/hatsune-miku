@@ -13,7 +13,8 @@ function bulkHelp(message, logger) {
             response.send(reply);
         })
         .catch(() => {
-            logger.error('Help: Error sending help to ' + message.author.username + ' (' + message.author.id + ')');
+            logger.error('Help: Error sending help to ' + message.author.username + ' (' + message.author.id + ')\n'
+                + err.stack);
         });
 }
 
