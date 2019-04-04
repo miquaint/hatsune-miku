@@ -1,5 +1,5 @@
 let Discord = require('discord.js');
-let logger = require('winston');
+let winston = require('winston');
 let mysql = require('mysql');
 let auth = require('./auth.json');
 let commands = require('./commands');
@@ -7,12 +7,33 @@ let experience = require('./experience');
 let help = require('./help');
 let someone = require('./someone');
 
+const DMCHANNELTYPES = ['dm', 'group'];
+
 // Configure logger settings
-logger.remove(logger.transports.Console);
-logger.add(new logger.transports.Console, {
-    colorize: true
+var logger = winston.createLogger({
+    format: winston.format.combine(
+      winston.format.timestamp({
+          format: 'YYYY-MM-DD HH:mm:ss'
+      }),
+      winston.format.colorize({
+          colors: {
+              error: 'red',
+              warning: 'yellow',
+              info: 'blue',
+              verbose: 'green',
+              debug: 'purple'
+          }
+      }),
+      winston.format.printf(info => `${info.timestamp}\t${info.level}:\t${info.message}`)
+    ),
+    level: process.argv[2],
+    transports: [
+      new winston.transports.Console(),
+      new winston.transports.File({
+          filename: 'logfiles/combine.log'
+      })
+    ]
 });
-logger.level = process.argv[2];
 
 // Initialize Discord Bot
 logger.info('Connecting to Miku...');
@@ -32,16 +53,18 @@ let connection = mysql.createConnection({
 });
 connection.connect(function(err) {
     if (err) {
-        logger.error('Error connecting to mySQL database: ' + err.stack);
+        logger.error('Error connecting to mySQL database:\n' + err.stack);
         return;
     }
     logger.info('Connection to mySQL database successful! Connected as id ' + connection.threadId);
 });
 
 client.on('message', message => {
-    // Our bot needs to know if it will execute a command
-    // It will listen for messages that will start with `h.`
-    if (message.author.id !== client.user.id && !message.author.bot) {
+    // Ignore messages from bots
+    if (!message.author.bot) {
+        let isDM = DMCHANNELTYPES.includes(message.channel.type);
+
+        // Listen for messages that will start with `h.`
         let command_selector = 'h.';
         if (message.content.substring(0, command_selector.length) === command_selector) {
             let args = message.content.substring(command_selector.length).split(/ +/);
@@ -51,40 +74,72 @@ client.on('message', message => {
             args = args.splice(1);
             switch (cmd) {
                 case 'ban':
-                    logger.info('Miku: ' + message.author.username + ' (' + message.author.id +
-                        ') has banned user(s) from ' + message.guild.name + ' (' + message.guild.id + ')');
-                    commands.ban.execute(message, logger, message.mentions.users);
+                    if (isDM) {
+                        commands.ban.dm(message);
+                    } else {
+                        logger.verbose('Miku: ' + message.author.username + ' (' + message.author.id
+                          + ') has used the "ban" command in ' + message.guild.name + ' (' + message.guild.id + ')');
+                        commands.ban.guild(message, logger, message.mentions.users);
+                    }
                     break;
                 case 'help':
+                    logger.silly('Miku: ' + message.author.username + ' (' + message.author.id
+                      + ') has requested generic help');
                     if (args[0]) {
                         let command = args[0];
-                        logger.verbose('Miku: ' + message.author.username + ' (' + message.author.id +
-                            ') has requested help with "' + command + '"');
+                        logger.silly('Miku: ' + message.author.username + ' (' + message.author.id
+                            + ') has requested help with "' + command + '"');
                         message.channel.send(commands[command].help());
                     } else {
-                        logger.verbose('Miku: ' + message.author.username + ' (' + message.author.id +
-                            ') has requested generic help');
-                        help.bulkHelp(message, logger);
+                        help.bulkHelp(message);
                     }
                     break;
                 case 'kick':
-                    logger.info('Miku: ' + message.author.username + ' (' + message.author.id +
-                        ') has kicked user(s) from ' + message.guild.name + ' (' + message.guild.id + ')');
-                    commands.kick.execute(message, logger, message.mentions.users);
+                    if (isDM) {
+                        commands.kick.dm(message);
+                    } else {
+                        logger.verbose('Miku: ' + message.author.username + ' (' + message.author.id
+                          + ') has used the "kick" command in ' + message.guild.name + ' (' + message.guild.id + ')');
+                        commands.kick.guild(message, logger, message.mentions.users);
+                    }
+                    break;
+                case 'profile':
+                    if (isDM) {
+                        commands.profile.dm(message, logger, connection, client);
+                    } else {
+                        logger.verbose('Miku: ' + message.author.username + ' (' + message.author.id
+                          + ') has viewed their profile.');
+                        commands.profile.guild(message, logger, connection, client);
+                    }
+                    break;
+                case 'purge':
+                    if (isDM) {
+                        commands.purge.dm(message);
+                    } else {
+                        logger.verbose('Miku: ' + message.author.username + ' (' + message.author.id
+                          + ') has used the "purge" command in ' + message.guild.name + ' (' + message.guild.id + ')');
+                        commands.purge.guild(message, logger, args);
+                    }
                     break;
                 case 'roll':
-                    logger.verbose('Miku: Dice rolled by ' + message.author.username + ' (' + message.author.id + ')');
-                    commands.roll.execute(message, logger, args);
+                    if (isDM) {
+                        commands.roll.dm(message, logger, args);
+                    } else {
+                        logger.silly('Miku: Dice rolled by ' + message.author.username + ' (' + message.author.id + ')');
+                        commands.roll.guild(message, logger, args);
+                    }
                     break;
             }
         } else {
-            // Give xp to the user
-            experience.message(message, logger, connection);
+            if (!isDM) {
+                // Give xp to the user
+                experience.message(message, logger, connection);
 
-            // Mention a random person in the current text channel
-            if (message.content.includes('@someone')) {
-                logger.info('Miku: ' + message.author.username + '(' + message.author.id + ') mentioned @someone');
-                someone.mention(message, logger);
+                // Mention a random person in the current text channel
+                if (message.content.includes('@someone')) {
+                    logger.debug('Miku: ' + message.author.username + '(' + message.author.id + ') mentioned @someone');
+                    someone.mention(message, logger);
+                }
             }
         }
     }
