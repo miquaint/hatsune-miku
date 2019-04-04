@@ -65,7 +65,7 @@ client.on('message', message => {
         let isDM = DMCHANNELTYPES.includes(message.channel.type);
 
         // Listen for messages that will start with `h.`
-        let command_selector = 'ht.';
+        let command_selector = 'h.';
         if (message.content.substring(0, command_selector.length) === command_selector) {
             let args = message.content.substring(command_selector.length).split(/ +/);
             let cmd = args[0];
@@ -101,6 +101,15 @@ client.on('message', message => {
                         logger.verbose('Miku: ' + message.author.username + ' (' + message.author.id
                           + ') has used the "kick" command in ' + message.guild.name + ' (' + message.guild.id + ')');
                         commands.kick.guild(message, logger, message.mentions.users);
+                    }
+                    break;
+                case 'profile':
+                    if (isDM) {
+                        commands.profile.dm(message, logger, connection, client);
+                    } else {
+                        logger.verbose('Miku: ' + message.author.username + ' (' + message.author.id
+                          + ') has viewed their profile.');
+                        commands.profile.guild(message, logger, connection, client);
                     }
                     break;
                 case 'purge':

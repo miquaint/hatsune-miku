@@ -8,13 +8,16 @@ function newUser(message, logger, connection) {
     let sql = 'INSERT INTO users VALUES (?, ?, ?, ?, ?)';
     connection.query(sql, [message.author.id, START_LEVEL, EXP_RESET, EXP_RESET, (LEVEL_SCALING + START_LEVEL) * EXP_MODIFIER],
         function(error, results, fields) {
-            if (err) {
-                logger.error('Experience: Error adding new user for experience:\n' + err.stack);
+            if (error) {
+                logger.error('Experience: Error adding new user for experience:\n' + error.stack);
                 return;
             }
 
             logger.verbose('Experience: ' + message.author.username + ' (' + message.author.id + ') successfully added to the users database');
     });
+
+    return [{level: START_LEVEL, total_exp: EXP_RESET, current_exp: EXP_RESET,
+        required_exp: (LEVEL_SCALING + START_LEVEL) * EXP_MODIFIER}];
 }
 
 function gainExp(message, logger, connection, userInfo) {
@@ -50,15 +53,13 @@ function levelUp(message, logger, userInfo) {
         let sql = 'SELECT * FROM users WHERE id = ?';
         connection.query(sql, [message.author.id], function(error, results, fields) {
             if (error) {
-                logger.warning('Experience: Error identifying user for experience:\n' + error.stack);
+                logger.warning('Experience: Error identifying user:\n' + error.stack);
                 return;
             }
 
             if (results.length === 0) {
-                newUser(message, logger, connection);
                 // Since the results were empty, populate them with the new data
-                results = [{level: START_LEVEL, total_exp: EXP_RESET, current_exp: EXP_RESET,
-                    required_exp: (LEVEL_SCALING + START_LEVEL) * EXP_MODIFIER}];
+                results = newUser(message, logger, connection);
             }
             gainExp(message, logger, connection, results);
         });
