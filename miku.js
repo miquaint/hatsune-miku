@@ -30,7 +30,7 @@ var logger = winston.createLogger({
     transports: [
       new winston.transports.Console(),
       new winston.transports.File({
-          filename: 'logfiles/combine.log'
+          filename: 'logs/combine.log'
       })
     ]
 });
