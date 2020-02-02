@@ -15,24 +15,29 @@ var logger = winston.createLogger({
       winston.format.timestamp({
           format: 'YYYY-MM-DD HH:mm:ss'
       }),
-      winston.format.colorize({
-          colors: {
-              error: 'red',
-              warning: 'yellow',
-              info: 'blue',
-              verbose: 'green',
-              debug: 'purple'
-          }
-      }),
       winston.format.printf(info => `${info.timestamp}\t${info.level}:\t${info.message}`)
     ),
     level: process.argv[2],
+    levels: {
+        error: 0,
+        warning: 1,
+        info: 2,
+        verbose: 3,
+        debug: 4
+    },
     transports: [
       new winston.transports.Console(),
       new winston.transports.File({
-          filename: 'logs/combine.log'
+          filename: 'logs/combined.log'
       })
     ]
+});
+winston.addColors({
+    error: 'red',
+        warning: 'yellow',
+        info: 'blue',
+        verbose: 'green',
+        debug: 'purple'
 });
 
 // Initialize Discord Bot
@@ -44,7 +49,7 @@ client.once('ready', function (evt) {
 });
 
 // Connect to the mySQL server
-logger.info('Connection to mySQL database...');
+logger.info('Connecting to mySQL database...');
 let connection = mysql.createConnection({
     host: auth.mysql_host,
     user: auth.mysql_user,
@@ -83,14 +88,14 @@ client.on('message', message => {
                     }
                     break;
                 case 'help':
-                    logger.silly('Miku: ' + message.author.username + ' (' + message.author.id
-                      + ') has requested generic help');
                     if (args[0]) {
                         let command = args[0];
-                        logger.silly('Miku: ' + message.author.username + ' (' + message.author.id
+                        logger.debug('Miku: ' + message.author.username + ' (' + message.author.id
                             + ') has requested help with "' + command + '"');
                         message.channel.send(commands[command].help());
                     } else {
+                        logger.debug('Miku: ' + message.author.username + ' (' + message.author.id
+                            + ') has requested generic help');
                         help.bulkHelp(message);
                     }
                     break;
@@ -125,7 +130,7 @@ client.on('message', message => {
                     if (isDM) {
                         commands.roll.dm(message, logger, args);
                     } else {
-                        logger.silly('Miku: Dice rolled by ' + message.author.username + ' (' + message.author.id + ')');
+                        logger.debug('Miku: Dice rolled by ' + message.author.username + ' (' + message.author.id + ')');
                         commands.roll.guild(message, logger, args);
                     }
                     break;
@@ -137,7 +142,7 @@ client.on('message', message => {
 
                 // Mention a random person in the current text channel
                 if (message.content.includes('@someone')) {
-                    logger.debug('Miku: ' + message.author.username + '(' + message.author.id + ') mentioned @someone');
+                    logger.verbose('Miku: ' + message.author.username + '(' + message.author.id + ') mentioned @someone');
                     someone.mention(message, logger);
                 }
             }
