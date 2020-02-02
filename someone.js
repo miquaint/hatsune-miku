@@ -15,7 +15,7 @@ function randomUser(set) {
         users.forEach(isBot);
         let userID = randomUser(users)[0];
 
-        logger.silly('Someone: ' + userID + ' was selected as @someone');
+        logger.debug('Someone: ' + userID + ' was selected as @someone');
         message.channel.send('<@' + userID + '>, you are @someone ^');
     }
 }());

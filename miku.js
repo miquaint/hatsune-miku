@@ -15,24 +15,29 @@ var logger = winston.createLogger({
       winston.format.timestamp({
           format: 'YYYY-MM-DD HH:mm:ss'
       }),
-      winston.format.colorize({
-          colors: {
-              error: 'red',
-              warning: 'yellow',
-              info: 'blue',
-              verbose: 'green',
-              debug: 'purple'
-          }
-      }),
       winston.format.printf(info => `${info.timestamp}\t${info.level}:\t${info.message}`)
     ),
     level: process.argv[2],
+    levels: {
+        error: 0,
+        warning: 1,
+        info: 2,
+        verbose: 3,
+        debug: 4
+    },
     transports: [
       new winston.transports.Console(),
       new winston.transports.File({
-          filename: 'logs/combine.log'
+          filename: 'logs/combined.log'
       })
     ]
+});
+winston.addColors({
+    error: 'red',
+        warning: 'yellow',
+        info: 'blue',
+        verbose: 'green',
+        debug: 'purple'
 });
 
 // Initialize Discord Bot
@@ -85,11 +90,11 @@ client.on('message', message => {
                 case 'help':
                     if (args[0]) {
                         let command = args[0];
-                        logger.silly('Miku: ' + message.author.username + ' (' + message.author.id
+                        logger.debug('Miku: ' + message.author.username + ' (' + message.author.id
                             + ') has requested help with "' + command + '"');
                         message.channel.send(commands[command].help());
                     } else {
-                        logger.silly('Miku: ' + message.author.username + ' (' + message.author.id
+                        logger.debug('Miku: ' + message.author.username + ' (' + message.author.id
                             + ') has requested generic help');
                         help.bulkHelp(message);
                     }
@@ -125,7 +130,7 @@ client.on('message', message => {
                     if (isDM) {
                         commands.roll.dm(message, logger, args);
                     } else {
-                        logger.silly('Miku: Dice rolled by ' + message.author.username + ' (' + message.author.id + ')');
+                        logger.debug('Miku: Dice rolled by ' + message.author.username + ' (' + message.author.id + ')');
                         commands.roll.guild(message, logger, args);
                     }
                     break;
