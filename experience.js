@@ -39,7 +39,7 @@ function gainExp(message, logger, connection, userInfo) {
 }
 
 function levelUp(message, logger, userInfo) {
-    logger.silly('Experience: ' + message.author.username + ' (' + message.author.id + ') just hit level ' + userInfo[0].level);
+    logger.debug('Experience: ' + message.author.username + ' (' + message.author.id + ') just hit level ' + userInfo[0].level);
     userInfo[0].current_exp = EXP_RESET;
     userInfo[0].required_exp += (LEVEL_SCALING + userInfo[0].level) * EXP_MODIFIER;
     userInfo[0].level++;
