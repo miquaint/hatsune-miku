@@ -44,7 +44,7 @@ client.once('ready', function (evt) {
 });
 
 // Connect to the mySQL server
-logger.info('Connection to mySQL database...');
+logger.info('Connecting to mySQL database...');
 let connection = mysql.createConnection({
     host: auth.mysql_host,
     user: auth.mysql_user,
@@ -83,14 +83,14 @@ client.on('message', message => {
                     }
                     break;
                 case 'help':
-                    logger.silly('Miku: ' + message.author.username + ' (' + message.author.id
-                      + ') has requested generic help');
                     if (args[0]) {
                         let command = args[0];
                         logger.silly('Miku: ' + message.author.username + ' (' + message.author.id
                             + ') has requested help with "' + command + '"');
                         message.channel.send(commands[command].help());
                     } else {
+                        logger.silly('Miku: ' + message.author.username + ' (' + message.author.id
+                            + ') has requested generic help');
                         help.bulkHelp(message);
                     }
                     break;
@@ -137,7 +137,7 @@ client.on('message', message => {
 
                 // Mention a random person in the current text channel
                 if (message.content.includes('@someone')) {
-                    logger.debug('Miku: ' + message.author.username + '(' + message.author.id + ') mentioned @someone');
+                    logger.verbose('Miku: ' + message.author.username + '(' + message.author.id + ') mentioned @someone');
                     someone.mention(message, logger);
                 }
             }

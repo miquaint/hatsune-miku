@@ -35,8 +35,6 @@ function gainExp(message, logger, connection, userInfo) {
                 logger.warning('Experience: Error giving user experience:\n' + error.stack);
                 return;
             }
-
-            logger.silly('Experience: ' + message.author.username + ' (' + message.author.id + ') sent a message that earned them experience');
     });
 }
 
