@@ -1,4 +1,4 @@
-const CORRECT_USAGE = '`ban @user [@additionalUser(s)]`';
+const CORRECT_USAGE = '`ban <@user> [@additionalUser(s)]`';
 
 function usage() {
     return 'Proper Usage of **Ban**:\n' + CORRECT_USAGE;
