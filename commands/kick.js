@@ -1,4 +1,4 @@
-const CORRECT_USAGE = '`kick @user [@additionalUser(s)]`';
+const CORRECT_USAGE = '`kick <@user> [@additionalUser(s)]`';
 
 function usage() {
     return 'Proper Usage of **Kick**:\n' + CORRECT_USAGE;

@@ -90,12 +90,8 @@ client.on('message', message => {
                 case 'help':
                     if (args[0]) {
                         let command = args[0];
-                        logger.debug('Miku: ' + message.author.username + ' (' + message.author.id
-                            + ') has requested help with "' + command + '"');
                         message.channel.send(commands[command].help());
                     } else {
-                        logger.debug('Miku: ' + message.author.username + ' (' + message.author.id
-                            + ') has requested generic help');
                         help.bulkHelp(message);
                     }
                     break;
@@ -110,11 +106,9 @@ client.on('message', message => {
                     break;
                 case 'profile':
                     if (isDM) {
-                        commands.profile.dm(message, logger, connection, client);
+                        commands.profile.dm(message, logger, connection, client, message.mentions.users);
                     } else {
-                        logger.verbose('Miku: ' + message.author.username + ' (' + message.author.id
-                          + ') has viewed their profile.');
-                        commands.profile.guild(message, logger, connection, client);
+                        commands.profile.guild(message, logger, connection, client, message.mentions.users);
                     }
                     break;
                 case 'purge':
@@ -142,7 +136,7 @@ client.on('message', message => {
 
                 // Mention a random person in the current text channel
                 if (message.content.includes('@someone')) {
-                    logger.verbose('Miku: ' + message.author.username + '(' + message.author.id + ') mentioned @someone');
+                    logger.debug('Miku: ' + message.author.username + '(' + message.author.id + ') mentioned @someone');
                     someone.mention(message, logger);
                 }
             }
