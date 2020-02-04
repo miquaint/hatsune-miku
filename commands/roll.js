@@ -1,4 +1,4 @@
-const CORRECT_USAGE = '`roll (number_of_dice)d(number_of_sides) [(+/-) flat_value]`';
+const CORRECT_USAGE = '`roll <number_of_dice>d<number_of_sides> [(+/-) flat_value]`';
 
 const MAX_DICE = 1000;
 const MAX_DICE_TO_DISPLAY = 100;

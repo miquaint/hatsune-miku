@@ -1,4 +1,4 @@
-const CORRECT_USAGE = '`purge numMessages`';
+const CORRECT_USAGE = '`purge <numMessages>`';
 
 function usage() {
     return 'Proper Usage of **Purge**:\n' + CORRECT_USAGE;
@@ -12,7 +12,7 @@ function usage() {
     };
 
     module.exports.dm = function(message, logger) {
-        message.channel.send('You can\'t purge message from a DM.');
+        message.channel.send('I can\'t purge messages from a DM.');
     };
 
     module.exports.guild = function(message, logger, args) {
