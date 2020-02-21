@@ -131,10 +131,16 @@ function roll(message, logger, args) {
 	};
 
 	module.exports.dm = function(message, logger, args) {
-		message.reply('Y' + roll(message, logger, args).substr(1));
+		let response = roll(message, logger, args);
+		if (response) {
+			message.reply('Y' + response.substr(1));
+		}
 	};
 
 	module.exports.guild = function(message, logger, args) {
-		message.reply(roll(message, logger, args));
+		let response = roll(message, logger, args);
+		if (response) {
+			message.reply(response);
+		}
 	};
 }());
